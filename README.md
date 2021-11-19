@@ -13,8 +13,8 @@ simConst.py <br>
 [Fonte](https://www.coppeliarobotics.com/helpFiles/en/remoteApiClientSide.htm)
 <br><br>
 
-# Arquivos do projeto
-## Cena para CoppeliaSim
+## Arquivos do projeto
+### Cena para CoppeliaSim
 
 A cena criada para utilização no **simulador CoppeliaSim** está disponível com o nome:
 
@@ -23,9 +23,13 @@ A cena criada para utilização no **simulador CoppeliaSim** está disponível c
 O projeto de cena criado no CoppeliaSim foi cedido pelo professor da disciplina, Rodrigo Calvo e não sofreu qualquer alteração a não ser aquela necessária para que o simulador se comunique com a IDE escolhida, conforme orientação disponível adiante.
 <br><br>
 
-## Código Python
+### Código Python
 
 Este trabalho conta com código em Python disponibilizado pelo arquivo:
 <br>
 **project_MapNav.py**
+
+## Informações relevantes para o trabalho
+
+Uma das informações necessárias para a realização do trabalho, diz respeito ao tamanho dos blocos de chão contidos numa cena criada no CoppeliaSim. Essa informação pode ser obtida no fórum do simulador, pelo tópico criado [About floor Size](https://forum.coppeliarobotics.com/viewtopic.php?f=9&t=9505)
 
