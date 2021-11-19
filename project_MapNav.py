@@ -1,8 +1,9 @@
-# coding=utf-8
+## coding=utf-8
 # Insert in a script in Coppelia
-    # simRemoteApi.start(19999)
+# in to pionner script. Replace any script that is there for this:
+# simRemoteApi.start(19999)
 try:
-    import sim
+    import sim #this line imports sim.py code file that has in directory project
 except:
     print('--------------------------------------------------------------')
     print('"sim.py" could not be imported. This means very probably that')
@@ -12,9 +13,11 @@ except:
     print('--------------------------------------------------------------')
     print('')
 
+# necessary imports some python libraries
 import numpy as np
 import matplotlib.pyplot as plt
 import time
+
 
 
 def readSensorData(clientId=-1,
