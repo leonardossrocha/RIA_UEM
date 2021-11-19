@@ -12,15 +12,18 @@ simConst.py <br>
 <br>
 [Fonte](https://www.coppeliarobotics.com/helpFiles/en/remoteApiClientSide.htm)
 <br><br>
-# Cena para CoppeliaSim
-<br>
+
+# Arquivos do projeto
+## Cena para CoppeliaSim
+
 A cena criada para utilização no **simulador CoppeliaSim** está disponível com o nome:
 <br><br>
 **pioneer-avoid.ttt**
 <br><br>
 O projeto de cena criado no CoppeliaSim foi cedido pelo professor da disciplina, Rodrigo Calvo e não sofreu qualquer alteração a não ser aquela necessária para que o simulador se comunique com a IDE escolhida, conforme orientação disponível adiante.
 <br><br>
-# Código Python
+
+## Código Python
 <br>
 Este trabalho conta com código em Python disponibilizado pelo arquivo:
 <br>
