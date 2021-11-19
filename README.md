@@ -24,9 +24,8 @@ O projeto de cena criado no CoppeliaSim foi cedido pelo professor da disciplina,
 <br><br>
 
 ## Código Python
-<br>
+
 Este trabalho conta com código em Python disponibilizado pelo arquivo:
 <br>
 **project_MapNav.py**
-<br>
 
