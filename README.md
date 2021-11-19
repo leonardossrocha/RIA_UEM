@@ -18,7 +18,9 @@ A cena criada para utilização no **simulador CoppeliaSim** está disponível c
 <br><br>
 **pioneer-avoid.ttt**
 <br><br>
->O projeto de cena criado no CoppeliaSim foi cedido pelo professor da disciplina, Rodrigo Calvo e não sofreu qualquer alteração a não ser aquela necessária para que o simulador se comunique com a IDE escolhida, conforme orientação disponível adiante.
+>O projeto de cena criado no CoppeliaSim foi cedido pelo professor da disciplina, Rodrigo Calvo 
+>e não sofreu qualquer alteração a não ser aquela necessária para que o simulador se comunique
+>com a IDE escolhida, conforme orientação disponível adiante.
 <br><br>
 # Código Python
 <br>
