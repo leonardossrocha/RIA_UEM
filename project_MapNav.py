@@ -3,7 +3,7 @@
 # in to pionner script. Replace any script that is there for this:
 # simRemoteApi.start(19999)
 try:
-    import sim #this line imports sim.py code file that has in directory project
+    import sim  # this line imports sim.py code file that has in directory project
 except:
     print('--------------------------------------------------------------')
     print('"sim.py" could not be imported. This means very probably that')
@@ -17,7 +17,6 @@ except:
 import numpy as np
 import matplotlib.pyplot as plt
 import time
-
 
 
 def readSensorData(clientId=-1,
@@ -120,7 +119,7 @@ if clientID != -1:
     print('INFORMAÇÕES DO LASER')
     print(laser_data)
     draw_laser_data(laser_data)
-    #print('QUANTIDADE DE LEITURAS: ', len(laser_data))
+    # print('QUANTIDADE DE LEITURAS: ', len(laser_data))
 
     returnCode, pos = sim.simxGetObjectPosition(clientID, robotHandle, -1, sim.simx_opmode_oneshot_wait)
     print('Pos: ', pos)
@@ -139,7 +138,7 @@ if clientID != -1:
 
         now = time.time()
         dt = now - lastTime
-        #sim.simxAddStatusbarMessage(clientID, str(i) + ' - DT: ' + str(dt), sim.simx_opmode_oneshot_wait)
+        # sim.simxAddStatusbarMessage(clientID, str(i) + ' - DT: ' + str(dt), sim.simx_opmode_oneshot_wait)
 
         # Fazendo leitura do laser
         raw_range_data, raw_angle_data = readSensorData(clientID, laser_range_data, laser_angle_data)
@@ -153,7 +152,7 @@ if clientID != -1:
         lado_direito = int(len(laser_data) * 1 / 4)
         lado_esquerdo = int(len(laser_data) * 3 / 4)
 
-        #mudança nos valor -30 / 30 / -30
+        # mudança nos valor -30 / 30 / -30
         if laser_data[frente, 1] < 1:
             v = 0.1
             w = np.deg2rad(-20)

@@ -3,7 +3,8 @@ import struct
 import sys
 import os
 import ctypes as ct
-from simConst import *
+import simConst
+#from simConst import *
 
 #load library
 libsimx = None
@@ -21,6 +22,7 @@ try:
     libsimx = ct.CDLL(libfullpath)
 except:
     print ('----------------------------------------------------')
+    print ('File sim.py')
     print ('The remoteApi library could not be loaded. Make sure')
     print ('it is located in the same folder as "sim.py", or')
     print ('appropriately adjust the file "sim.py"')
