@@ -19,19 +19,15 @@ import matplotlib.pyplot as plt
 import time
 
 
-def readSensorData(clientId=-1,
-                   range_data_signal_id="hokuyo_range_data",
-                   angle_data_signal_id="hokuyo_angle_data"):
+def readSensorData(clientId=-1, range_data_signal_id="hokuyo_range_data", angle_data_signal_id="hokuyo_angle_data"):
     # the first call should be non-blocking to avoid getting out-of-sync angle data
-    returnCodeRanges, string_range_data = sim.simxGetStringSignal(clientId, range_data_signal_id,
-                                                                  sim.simx_opmode_streaming)
+    returnCodeRanges, string_range_data = sim.simxGetStringSignal(clientId, range_data_signal_id, sim.simx_opmode_streaming)
 
     # the second call should block to avoid out-of-sync scenarios
     # between your python script and the simulator's main loop
     # (your script may be slower than the simulator's main loop, thus
     # slowing down data processing)
-    returnCodeAngles, string_angle_data = sim.simxGetStringSignal(clientId, angle_data_signal_id,
-                                                                  sim.simx_opmode_blocking)
+    returnCodeAngles, string_angle_data = sim.simxGetStringSignal(clientId, angle_data_signal_id, sim.simx_opmode_blocking)
 
     # check the if both data were obtained correctly
     if returnCodeRanges == 0 and returnCodeAngles == 0:
@@ -63,7 +59,9 @@ def draw_laser_data(laser_data, max_sensor_range=5):
             ax.plot(x, y, 'o', color=c)
 
     ax.plot(0, 0, 'k>', markersize=10)
-
+    #plt.plot(x, y)
+    plt.show()
+    
     ax.grid()
     ax.set_xlim([-max_sensor_range, max_sensor_range])
     ax.set_ylim([-max_sensor_range, max_sensor_range])
@@ -119,6 +117,8 @@ if clientID != -1:
     print('INFORMAÇÕES DO LASER')
     print(laser_data)
     draw_laser_data(laser_data)
+    
+    # Para identificar a quantidade de leitura descomente a linha a seguir
     # print('QUANTIDADE DE LEITURAS: ', len(laser_data))
 
     returnCode, pos = sim.simxGetObjectPosition(clientID, robotHandle, -1, sim.simx_opmode_oneshot_wait)
@@ -143,6 +143,40 @@ if clientID != -1:
         # Fazendo leitura do laser
         raw_range_data, raw_angle_data = readSensorData(clientID, laser_range_data, laser_angle_data)
         laser_data = np.array([raw_angle_data, raw_range_data]).T
+
+	#MAPEAMENTO - INICIO
+        #Para cada feixe de laser
+            #INVERSE SENSOR MODEL
+            if raw_angle_data[i] < RANGE_MAX * RANGE_LIMIT:
+                taxaOC = 0.9
+            else {
+                taxaOC = 0.48
+            }
+            RANGE_MAX = 5
+            RANGE_LIMIT = 0.3
+            PRIORI = 0.5
+
+            # Calcular a posição xL, yL de onde o laser bateu
+            # mudar o RES por res que é a variável que foi criada anterioremente
+            xL = cos(raw_angle_data[i] + theta) * raw_angle_data[i] / RES + (posX); // + Largura / 2;
+            yL = sin(raw_angle_data[i] + theta) * raw_angle_data[i] / RES + (posY);
+            #posX e posY são as coordenadas do robô na GRID
+
+            # Calcular todos as células de acordo com o algoritmo de Bresenham
+            line_bresenham = np.zeros((rows, cols), dtype=np.uint8)
+            rr, cc = line(yi, xi, yoi, xoi)  # r0, c0, r1, c1
+            line_bresenham[rr, cc] = 1
+
+            #ATUALIZAR A GRID
+            #Para cada célula da matriz por onde o feixe passa
+            #Atualizar a GRID
+            P(MxLyL) = 1 - pow((1 + (taxaOC / (1 - taxaOC)) * ((1 - PRIORI) / PRIORI) * (m[xL,yL] / ((1 - m[xL,yL])), -1));
+            #Atualizar xL, yL de acordo com o algoritmo de Bresenham
+        
+        ##############
+        # MAPEAMENTO #
+	# FIM	     #
+	##############
 
         # Velocidade básica (linear, angular)
         v = 0
