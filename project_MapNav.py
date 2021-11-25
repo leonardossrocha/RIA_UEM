@@ -141,6 +141,7 @@ if clientID != -1:
         # sim.simxAddStatusbarMessage(clientID, str(i) + ' - DT: ' + str(dt), sim.simx_opmode_oneshot_wait)
 
         # Fazendo leitura do laser
+        # Leitura do sensor para range e ângulo
         raw_range_data, raw_angle_data = readSensorData(clientID, laser_range_data, laser_angle_data)
         laser_data = np.array([raw_angle_data, raw_range_data]).T
 
