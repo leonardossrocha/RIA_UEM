@@ -1,6 +1,9 @@
 # coding=utf-8
 # Insert in a script in Coppelia
 # simRemoteApi.start(19999)
+import theta as theta
+from reportbug.ui.text_ui import rows
+
 try:
     import sim
 except:
@@ -15,6 +18,7 @@ except:
 import numpy as np
 import matplotlib.pyplot as plt
 import time
+import math
 
 
 def readSensorData(clientId=-1,
@@ -36,6 +40,9 @@ def readSensorData(clientId=-1,
         # unpack data from range and sensor messages
         raw_range_data = sim.simxUnpackFloats(string_range_data)
         raw_angle_data = sim.simxUnpackFloats(string_angle_data)
+
+        # print('sensor range: ', (raw_range_data)) # Grande volume de dados do range
+        # print('sensor dados: ', (raw_angle_data)) # Grande volume de dados
 
         return raw_range_data, raw_angle_data
 
@@ -114,6 +121,16 @@ if clientID != -1:
     raw_range_data, raw_angle_data = readSensorData(clientID, laser_range_data, laser_angle_data)
     laser_data = np.array([raw_angle_data, raw_range_data]).T
 
+    # Fazendo leitura do laser
+    # Leitura do sensor para range e ângulo
+    # --> Remover as linhas de baixo pois se repetem
+    #raw_range_data, raw_angle_data = readSensorData(clientID, laser_range_data, laser_angle_data)
+    #laser_data = np.array([raw_angle_data, raw_range_data]).T
+
+    # print('laser infos')
+    # print("laser data: ", laser_data)
+    # print("laser angle: ", raw_angle_data)
+
     #print('INFORMAÇÕES DO LASER')
     print(laser_data)
     draw_laser_data(laser_data)
@@ -121,6 +138,14 @@ if clientID != -1:
 
     returnCode, pos = sim.simxGetObjectPosition(clientID, robotHandle, -1, sim.simx_opmode_oneshot_wait)
     print('Pos: ', pos)
+    #print('PosX: ', pos[0])
+    #print('PosY: ', pos[1])
+    #print('PosZ: ', pos[2])
+
+    #decompondo a posicao do robo
+    PosX = pos[0]
+    PosY = pos[1]
+    PosZ = pos[2]
 
     # Dados do Pioneer
     L = 0.381  # Metros
@@ -138,10 +163,6 @@ if clientID != -1:
         dt = now - lastTime
         #sim.simxAddStatusbarMessage(clientID, str(i) + ' - DT: ' + str(dt), sim.simx_opmode_oneshot_wait)
 
-        # Fazendo leitura do laser
-        # Leitura do sensor para range e ângulo
-        raw_range_data, raw_angle_data = readSensorData(clientID, laser_range_data, laser_angle_data)
-        laser_data = np.array([raw_angle_data, raw_range_data]).T
 
         # MAPEAMENTO - INICIO
         # Para cada feixe de laser
@@ -158,15 +179,15 @@ if clientID != -1:
         largGrid = 500
         altGrid = 500
         RES = res = 0.02
-        x = posX
-        y = posY
+        x = PosX
+        y = PosY
         xGrid = (x / res) + (largGrid / 2)
         yGrid = (y / res) + (altGrid / 2)
         largura = xGrid
 
         # Calcular a posição xL, yL de onde o laser bateu
-        xL = cos(raw_angle_data[i] + theta) * raw_angle_data[i] / res + (posX) + largura / 2
-        yL = sin(raw_angle_data[i] + theta) * raw_angle_data[i] / res + (posY)
+        xL = math.cos(raw_angle_data[i] + theta) * raw_angle_data[i] / res + (PosX) + largura / 2
+        yL = math.sin(raw_angle_data[i] + theta) * raw_angle_data[i] / res + (PosY)
         #posX e posY são as coordenadas do robô na GRID
 
         # Calcular todos as células de acordo com o algoritmo de Bresenham
