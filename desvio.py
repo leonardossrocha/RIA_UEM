@@ -186,8 +186,8 @@ if clientID != -1:
         largura = xGrid
 
         # Calcular a posição xL, yL de onde o laser bateu
-        xL = math.cos(raw_angle_data[i] + theta) * raw_angle_data[i] / res + (PosX) + largura / 2
-        yL = math.sin(raw_angle_data[i] + theta) * raw_angle_data[i] / res + (PosY)
+        xL = math.cos((raw_angle_data[i] + theta) * raw_angle_data[i] / res + (PosX) + largura / 2)
+        yL = math.sin((raw_angle_data[i] + theta) * raw_angle_data[i] / res + (PosY))
         #posX e posY são as coordenadas do robô na GRID
 
         # Calcular todos as células de acordo com o algoritmo de Bresenham
