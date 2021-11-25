@@ -1,9 +1,8 @@
-## coding=utf-8
+# coding=utf-8
 # Insert in a script in Coppelia
-# in to pionner script. Replace any script that is there for this:
 # simRemoteApi.start(19999)
 try:
-    import sim  # this line imports sim.py code file that has in directory project
+    import sim
 except:
     print('--------------------------------------------------------------')
     print('"sim.py" could not be imported. This means very probably that')
@@ -13,21 +12,24 @@ except:
     print('--------------------------------------------------------------')
     print('')
 
-# necessary imports some python libraries
 import numpy as np
 import matplotlib.pyplot as plt
 import time
 
 
-def readSensorData(clientId=-1, range_data_signal_id="hokuyo_range_data", angle_data_signal_id="hokuyo_angle_data"):
+def readSensorData(clientId=-1,
+                   range_data_signal_id="hokuyo_range_data",
+                   angle_data_signal_id="hokuyo_angle_data"):
     # the first call should be non-blocking to avoid getting out-of-sync angle data
-    returnCodeRanges, string_range_data = sim.simxGetStringSignal(clientId, range_data_signal_id, sim.simx_opmode_streaming)
+    returnCodeRanges, string_range_data = sim.simxGetStringSignal(clientId, range_data_signal_id,
+                                                                  sim.simx_opmode_streaming)
 
     # the second call should block to avoid out-of-sync scenarios
     # between your python script and the simulator's main loop
     # (your script may be slower than the simulator's main loop, thus
     # slowing down data processing)
-    returnCodeAngles, string_angle_data = sim.simxGetStringSignal(clientId, angle_data_signal_id, sim.simx_opmode_blocking)
+    returnCodeAngles, string_angle_data = sim.simxGetStringSignal(clientId, angle_data_signal_id,
+                                                                  sim.simx_opmode_blocking)
 
     # check the if both data were obtained correctly
     if returnCodeRanges == 0 and returnCodeAngles == 0:
@@ -59,9 +61,7 @@ def draw_laser_data(laser_data, max_sensor_range=5):
             ax.plot(x, y, 'o', color=c)
 
     ax.plot(0, 0, 'k>', markersize=10)
-    #plt.plot(x, y)
-    plt.show()
-    
+
     ax.grid()
     ax.set_xlim([-max_sensor_range, max_sensor_range])
     ax.set_ylim([-max_sensor_range, max_sensor_range])
@@ -114,12 +114,10 @@ if clientID != -1:
     raw_range_data, raw_angle_data = readSensorData(clientID, laser_range_data, laser_angle_data)
     laser_data = np.array([raw_angle_data, raw_range_data]).T
 
-    print('INFORMAÇÕES DO LASER')
+    #print('INFORMAÇÕES DO LASER')
     print(laser_data)
     draw_laser_data(laser_data)
-    
-    # Para identificar a quantidade de leitura descomente a linha a seguir
-    # print('QUANTIDADE DE LEITURAS: ', len(laser_data))
+    #print('QUANTIDADE DE LEITURAS: ', len(laser_data))
 
     returnCode, pos = sim.simxGetObjectPosition(clientID, robotHandle, -1, sim.simx_opmode_oneshot_wait)
     print('Pos: ', pos)
@@ -138,45 +136,51 @@ if clientID != -1:
 
         now = time.time()
         dt = now - lastTime
-        # sim.simxAddStatusbarMessage(clientID, str(i) + ' - DT: ' + str(dt), sim.simx_opmode_oneshot_wait)
+        #sim.simxAddStatusbarMessage(clientID, str(i) + ' - DT: ' + str(dt), sim.simx_opmode_oneshot_wait)
 
         # Fazendo leitura do laser
         raw_range_data, raw_angle_data = readSensorData(clientID, laser_range_data, laser_angle_data)
         laser_data = np.array([raw_angle_data, raw_range_data]).T
 
-	#MAPEAMENTO - INICIO
-        #Para cada feixe de laser
-            #INVERSE SENSOR MODEL
-            if raw_angle_data[i] < RANGE_MAX * RANGE_LIMIT:
-                taxaOC = 0.9
-            else {
-                taxaOC = 0.48
-            }
-            RANGE_MAX = 5
-            RANGE_LIMIT = 0.3
-            PRIORI = 0.5
+        # MAPEAMENTO - INICIO
+        # Para cada feixe de laser
+        # INVERSE SENSOR MODEL
+        RANGE_MAX = 5
+        RANGE_LIMIT = 0.3
+        PRIORI = 0.5
 
-            # Calcular a posição xL, yL de onde o laser bateu
-            # mudar o RES por res que é a variável que foi criada anterioremente
-            xL = cos(raw_angle_data[i] + theta) * raw_angle_data[i] / RES + (posX); // + Largura / 2;
-            yL = sin(raw_angle_data[i] + theta) * raw_angle_data[i] / RES + (posY);
-            #posX e posY são as coordenadas do robô na GRID
+        if raw_angle_data[i] < RANGE_MAX * RANGE_LIMIT:
+            taxaOC = 0.9
+        else:
+            taxaOC = 0.48
 
-            # Calcular todos as células de acordo com o algoritmo de Bresenham
-            line_bresenham = np.zeros((rows, cols), dtype=np.uint8)
-            rr, cc = line(yi, xi, yoi, xoi)  # r0, c0, r1, c1
-            line_bresenham[rr, cc] = 1
+        largGrid = 500
+        altGrid = 500
+        RES = res = 0.02
+        x = posX
+        y = posY
+        xGrid = (x / res) + (largGrid / 2)
+        yGrid = (y / res) + (altGrid / 2)
+        largura = xGrid
 
-            #ATUALIZAR A GRID
-            #Para cada célula da matriz por onde o feixe passa
-            #Atualizar a GRID
-            P(MxLyL) = 1 - pow((1 + (taxaOC / (1 - taxaOC)) * ((1 - PRIORI) / PRIORI) * (m[xL,yL] / ((1 - m[xL,yL])), -1));
-            #Atualizar xL, yL de acordo com o algoritmo de Bresenham
-        
-        ##############
-        # MAPEAMENTO #
-	# FIM	     #
-	##############
+        # Calcular a posição xL, yL de onde o laser bateu
+        xL = cos(raw_angle_data[i] + theta) * raw_angle_data[i] / res + (posX) + largura / 2
+        yL = sin(raw_angle_data[i] + theta) * raw_angle_data[i] / res + (posY)
+        #posX e posY são as coordenadas do robô na GRID
+
+        # Calcular todos as células de acordo com o algoritmo de Bresenham
+        line_bresenham = np.zeros((rows, cols), dtype=np.uint8)
+        rr, cc = line(yi, xi, yoi, xoi)  # r0, c0, r1, c1
+        line_bresenham[rr, cc] = 1
+
+        # ATUALIZAR A GRID
+        # Para cada célula da matriz por onde o feixe passa
+        # Atualizar a GRID
+        # P(MxLyL)
+        PMxLyL = 1 - pow((1 + (taxaOC / (1 - taxaOC)) * ((1 - PRIORI) / PRIORI) * (m[xL,yL] / ((1 - m[xL,yL])), -1)))
+        # Atualizar xL, yL de acordo com o algoritmo de Bresenham
+
+        # MAPEAMENTO - FIM
 
         # Velocidade básica (linear, angular)
         v = 0
@@ -186,10 +190,9 @@ if clientID != -1:
         lado_direito = int(len(laser_data) * 1 / 4)
         lado_esquerdo = int(len(laser_data) * 3 / 4)
 
-        # mudança nos valor -30 / 30 / -30
         if laser_data[frente, 1] < 1:
             v = 0.1
-            w = np.deg2rad(-20)
+            w = np.deg2rad(-30)
         elif laser_data[lado_direito, 1] < 1:
             v = 0.1
             w = np.deg2rad(30)
