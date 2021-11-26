@@ -164,7 +164,9 @@ if clientID != -1:
         #sim.simxAddStatusbarMessage(clientID, str(i) + ' - DT: ' + str(dt), sim.simx_opmode_oneshot_wait)
 
 
-        # MAPEAMENTO - INICIO
+        '''
+        INÍCIO DO BLOCO DE MAPEAMENTO
+        '''
         # Para cada feixe de laser
         # INVERSE SENSOR MODEL
         RANGE_MAX = 5
@@ -214,11 +216,10 @@ if clientID != -1:
         point1 = (yi, xi)
         point2 =
 
-        # NAVEGAÇÃO
+        '''
+        INÍCIO DO BLOCO DE NAVEGAÇÃO
+        '''
 
-        front = in(len(laser_data) / 2)
-        rightSide = int(len(laser_data) *1 / 4)
-        rightLeft = int(len(laser_data) * 1 / 4)
         #############
         #############
         #############
@@ -226,6 +227,7 @@ if clientID != -1:
         #############
         #############
         #############
+
 
         rows, cols = (map_size / cell_size).astype(int)
 
@@ -236,7 +238,7 @@ if clientID != -1:
         line_bresenham = np.zeros((rows, cols), dtype=np.uint8)
         rr, cc = line(yi, xi, yoi, xoi)  # r0, c0, r1, c1
         line_bresenham[rr, cc] = 1
-        '''
+
         # ATUALIZAR A GRID
         # Para cada célula da matriz por onde o feixe passa
         # Atualizar a GRID
@@ -250,9 +252,16 @@ if clientID != -1:
         v = 0
         w = np.deg2rad(0)
 
-        frente = int(len(laser_data) / 2)
-        lado_direito = int(len(laser_data) * 1 / 4)
-        lado_esquerdo = int(len(laser_data) * 3 / 4)
+        front = in (len(laser_data) / 2)
+        rightSide = int(len(laser_data) * 1 / 4)
+        leftSide = int(len(laser_data) * 3 / 4)
+
+        '''
+        TESTAR ESSE BLOCO PARA ENCURTAR CÓDIGO ABAIXO
+        if ((laser_data[front, 1] < 1) or (laser_data[leftSide, 1] < 1)):
+              v = 0.05
+              w = np.deg2rad(-20)
+        '''
 
         if laser_data[frente, 1] < 1:
             v = 0.1
