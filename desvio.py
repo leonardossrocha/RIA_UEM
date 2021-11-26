@@ -1,7 +1,7 @@
 # coding=utf-8
 # Insert in a script in Coppelia
 # simRemoteApi.start(19999)
-import theta as theta
+from reportbug.debbugs import line
 from reportbug.ui.text_ui import rows
 
 try:
@@ -156,7 +156,7 @@ if clientID != -1:
     startTime = time.time()
     lastTime = startTime
     dt = 0
-    i = 0;
+    i = 0
     while t < 240:
 
         now = time.time()
@@ -176,25 +176,67 @@ if clientID != -1:
         else:
             taxaOC = 0.48
 
-        largGrid = 500
-        altGrid = 500
-        RES = res = 0.02
+        largGrid, altGrid = 500
+        res = 0.02
         x = PosX
         y = PosY
         xGrid = (x / res) + (largGrid / 2)
         yGrid = (y / res) + (altGrid / 2)
         largura = xGrid
 
+        ########################################
+        # Inseridos por mim
+        returnCode, th = sim.simxGetObjectOrientation(clientID, robotHandle, -1, sim.simx_opmode_oneshot_wait)
+        tx, ty, theta = th
+        ########################################
+
         # Calcular a posição xL, yL de onde o laser bateu
-        xL = math.cos((raw_angle_data[i] + theta) * raw_angle_data[i] / res + (PosX) + largura / 2)
-        yL = math.sin((raw_angle_data[i] + theta) * raw_angle_data[i] / res + (PosY))
+        xL = math.cos(raw_angle_data[i] + theta) * raw_angle_data[i] + PosX
+        yL = math.sin(raw_angle_data[i] + theta) * raw_angle_data[i] + PosY
         #posX e posY são as coordenadas do robô na GRID
+
+        #Conversão das posições xL e yL
+
+        xLGrid = int((xL / res) + (largGrid / 2))
+        yLGrid = int(altGrid - ((yL / res) + (altGrid / 2)))
+
+        if xLGrid < 0:
+            xLGrid = 0
+        elif xLGrid >= largGrid:
+            xlwt = largGrid-1
 
         # Calcular todos as células de acordo com o algoritmo de Bresenham
         line_bresenham = np.zeros((rows, cols), dtype=np.uint8)
+        xi = posXgrid
+        yi = posYgrid
+        xoi = xLGrid
+        yoi = yLGrid
+        point1 = (yi, xi)
+        point2 =
+
+        # NAVEGAÇÃO
+
+        front = in(len(laser_data) / 2)
+        rightSide = int(len(laser_data) *1 / 4)
+        rightLeft = int(len(laser_data) * 1 / 4)
+        #############
+        #############
+        #############
+        ## PAROU AQUI
+        #############
+        #############
+        #############
+
+        rows, cols = (map_size / cell_size).astype(int)
+
+
+        m = np.random.uniform(low=0.0, high=1.0, size=(rows, cols))
+        #rows, cols = 500
+
+        line_bresenham = np.zeros((rows, cols), dtype=np.uint8)
         rr, cc = line(yi, xi, yoi, xoi)  # r0, c0, r1, c1
         line_bresenham[rr, cc] = 1
-
+        '''
         # ATUALIZAR A GRID
         # Para cada célula da matriz por onde o feixe passa
         # Atualizar a GRID
