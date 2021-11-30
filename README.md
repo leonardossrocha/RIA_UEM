@@ -29,7 +29,16 @@ Este trabalho conta com código em Python disponibilizado pelo arquivo:
 <br>
 **avoidObstacle.py**
 
+### Plotagem
+
+Foi construído um diretório **Plotagens** onde é possível identificar duas plotagens de coleta de informações do robô sobre o ambiente mapeado.
+
+
 ## Informações relevantes para o trabalho
 
 Uma das informações necessárias para a realização do trabalho, diz respeito ao tamanho dos blocos de chão contidos numa cena criada no CoppeliaSim. Essa informação pode ser obtida no fórum do simulador, pelo tópico criado [About floor Size](https://forum.coppeliarobotics.com/viewtopic.php?f=9&t=9505)
+
+## Ferramentas utilizadas
+
+Ferramentas adicionais utilizadas, além das já mencionadas até o momento, é o plugin [gridMap](https://github.com/roboticafacil/coppeliasim_gridmap) mas apresentou problemas em sua estrutura e até o momento da entrega desse relatório, não havia sido solucionado pelo upstream. 
 

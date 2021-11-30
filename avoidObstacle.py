@@ -212,36 +212,29 @@ if clientID != -1:
 
     #print('INFORMAÇÕES DO LASER')
     print(laser_data)
-    #draw_laser_data(laser_data)
-    #print('QUANTIDADE DE LEITURAS: ', len(laser_data))
-
-    #returnCode, pos = sim.simxGetObjectPosition(clientID, robotHandle, -1, sim.simx_opmode_oneshot_wait)
-    #print('Posição do Robô: ', pos)
-
+    
     # Dados do Pioneer
     L = 0.381  # Metros
     r = 0.0975  # Metros
 
     t = 0
-    # Lembrar de habilitar o 'Real-time mode'
     startTime = time.time()
     lastTime = startTime
     dt = 0
     i = 0
     while t < 240:
-
+        #Guarda o tempo em segundos entre as leituras de tempo
         now = time.time()
-        dt = now - lastTime
-        #sim.simxAddStatusbarMessage(clientID, str(i) + ' - DT: ' + str(dt), sim.simx_opmode_oneshot_wait)
+        dt = now - lastTime #subtrai o tempo atual do último tempo guardado na variável
 
         '''
         Sart reading laser
         '''
-        raw_range_data, raw_angle_data = readSensorData(clientID, laser_range_data, laser_angle_data)
+        raw_range_data, raw_angle_data = readSensorData(clientID, laser_range_data, laser_angle_data)   # Keep laser data
         laser_data = np.array([raw_angle_data, raw_range_data]).T
 
         returnCode, pos = sim.simxGetObjectPosition(clientID, robotHandle, -1, sim.simx_opmode_oneshot_wait)
-        posX, posY, posZ = pos
+        posX, posY, posZ = pos  # keep robot position safe in X and Y dimension.
         print('Pos', pos)
 
         #Converts robot position from environment to grid
@@ -257,10 +250,12 @@ if clientID != -1:
         '''
         '''
         Starts mapping
+        Responsible to safe mapping information
         '''
+        # laço para leitura dos feixes do laser 
         for i in range(len(raw_range_data)):
             if raw_range_data[i] < RANGE_MAX * RANGE_LIMIT:
-                taxaOC = 0.9
+                taxaOC = 0.9    # atribuição de valor de taxa de ocupação na Grid
             else:
                 taxaOC = 0.48
 
@@ -372,6 +367,7 @@ if clientID != -1:
 
     '''
     Bloco para plotagem do mapa
+    Mapping plot block
     '''
     plt.imshow(m, cmap='Greys', origin='upper', extent=(0, cols, rows, 0))
     plt.show()
