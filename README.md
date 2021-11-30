@@ -13,7 +13,16 @@ simConst.py <br>
 [Fonte](https://www.coppeliarobotics.com/helpFiles/en/remoteApiClientSide.htm)
 <br><br>
 
-## Arquivos do projeto
+## Projeto
+
+### Requisitos
+
+Módulos instalados previamente:<br><br>
+numpy<br>
+matplotlib<br>
+time<br>
+math<br>
+
 ### Cena para CoppeliaSim
 
 A cena criada para utilização no **simulador CoppeliaSim** está disponível com o nome:
