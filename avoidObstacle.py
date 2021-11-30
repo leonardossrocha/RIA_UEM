@@ -1,8 +1,8 @@
 # coding=utf-8
 # Insert in a script in Coppelia
 # simRemoteApi.start(19999)
-from reportbug.debbugs import line
-from reportbug.ui.text_ui import rows
+#from reportbug.debbugs import line
+#from reportbug.ui.text_ui import rows
 
 try:
     import sim
@@ -255,7 +255,6 @@ if clientID != -1:
         '''
         Ends reading laser
         '''
-
         '''
         Starts mapping
         '''
