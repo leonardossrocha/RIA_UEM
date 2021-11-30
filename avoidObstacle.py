@@ -168,22 +168,22 @@ sim.simxFinish(-1)  # just in case, close all opened connections
 clientID = sim.simxStart('127.0.0.1', 19999, True, True, 5000, 5)
 
 if clientID != -1:
-    # Now try to retrieve data in a blocking fashion (i.e. a service call):
+    # Inicia o serviço de coleta
     res, objs = sim.simxGetObjects(clientID, sim.sim_handle_all, sim.simx_opmode_blocking)
     if res == sim.simx_return_ok:
-        print('Number of objects in the scene: ', len(objs))
+        print('Number of objects in the scene: ', len(objs)) #conta a quantidade de objetos em cena
     else:
         print('Remote API function call returned with error code: ', res)
 
     # Iniciando a simulação
     # Deve usar a porta do 'continuous remote API server services' (remoteApiConnections.txt)
     sim.simxStartSimulation(clientID, sim.simx_opmode_oneshot_wait)
-
+    #Bloco para mensagem de conexão bem sucedida
     print('Connected to remote API server')
     sim.simxAddStatusbarMessage(clientID, 'Iniciando...', sim.simx_opmode_oneshot_wait)
     time.sleep(0.02)
 
-    # Handle para o Robô
+    # Handle para o Robô - colega identificação do objeto
     robotname = 'Pioneer_p3dx'
     erro, robotHandle = sim.simxGetObjectHandle(clientID, robotname, sim.simx_opmode_oneshot_wait)
 

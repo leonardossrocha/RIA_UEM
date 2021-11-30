@@ -18,7 +18,7 @@ simConst.py <br>
 
 A cena criada para utilização no **simulador CoppeliaSim** está disponível com o nome:
 
-**pioneer-avoid.ttt**
+**scene2.ttt**
 
 O projeto de cena criado no CoppeliaSim foi cedido pelo professor da disciplina, Rodrigo Calvo e não sofreu qualquer alteração a não ser aquela necessária para que o simulador se comunique com a IDE escolhida, conforme orientação disponível adiante.
 <br><br>
@@ -27,7 +27,7 @@ O projeto de cena criado no CoppeliaSim foi cedido pelo professor da disciplina,
 
 Este trabalho conta com código em Python disponibilizado pelo arquivo:
 <br>
-**project_MapNav.py**
+**avoidObstacle.py**
 
 ## Informações relevantes para o trabalho
 
