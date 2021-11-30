@@ -1,6 +1,6 @@
 # Disciplina: Robótica Inteligente e Autônoma 
 ### Universidade Estadual de Maringá
-Projeto da disciplina de Robótica Inteligente e Autônoma para mapeamento e navegação.
+Projeto da disciplina de Robótica Inteligente e Autônoma para mapeamento e navegação.<br>
 Professor: Rodrigo Calvo
 <br><br><br>
 Projeto utilizando o simulador [CoppeliaSim](https://www.coppeliarobotics.com/)
