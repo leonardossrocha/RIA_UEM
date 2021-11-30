@@ -68,11 +68,100 @@ def draw_laser_data(laser_data, max_sensor_range=5):
             ax.plot(x, y, 'o', color=c)
 
     ax.plot(0, 0, 'k>', markersize=10)
+    plt.show()
 
     ax.grid()
     ax.set_xlim([-max_sensor_range, max_sensor_range])
     ax.set_ylim([-max_sensor_range, max_sensor_range])
 
+'''
+Start Bresenham's function implementation
+'''
+def get_line(start, end):
+    x1, y1 = start
+    x2, y2 = end
+    dx = x2 - x1
+    dy = y2 - y1
+
+    is_steep = abs(dy) > abs(dx)
+
+    #rotate line
+    if is_steep:
+        x1, y1 = y1, x1
+        x2, y2 = y2, x2
+
+    #Swap start and end points if necessary and store swap stats
+    swapped = False
+    if x1 > x2:
+        x1, x2 = x2, x1
+        y1, y2 = y2, y1
+        swapped = True
+
+    # Differential recalculation
+    dx = x2 - x1
+    dy = y2 - y1
+
+    # Error Calculation
+    error = int(dx / 2.0)
+    ystep = 1 if y1 < y2 else -1
+
+    # Iterate over bounding box generating points between start and end
+    y = y1
+    points = []
+    x1 = int(x1)
+    x2 = int(x2)
+    for x in range(x1, x2+1):
+        coord = (y, x) if is_steep else (x, y)
+        points.append(coord)
+        error -= abs(dy)
+        if error < 0:
+            y += ystep
+            error += dx
+
+    # Reverse the list if the coordinates were swapped
+    if swapped:
+        points.reverse()
+    return points
+
+'''
+Ends Bresenham's function implementation
+'''
+
+'''
+Start Grid Parameters
+'''
+
+LARGGRID = 500
+ALTGRID = 500
+RES = 0.03
+RANGE_MAX = 5
+RANGE_LIMIT = 0.3
+PRIORI = 0.5
+
+fig = plt.figure(figsize=(8, 8), dpi=100)
+ax = fig.add_subplot(111, aspect='equal')
+
+map_size = np.array([LARGGRID, ALTGRID])
+cell_size = 1
+
+rows, cols = (map_size / cell_size).astype(int)
+
+m = np.random.uniform(low=0.0, high=1.0, size=(rows, cols))
+
+# Inicialize grid cells with unknown probability value
+m[::, ::] = PRIORI
+
+# determina o tom de cor a ser plotado
+m[0, 0] = 1
+m[499, 499] = 0
+
+'''
+End Grid Parameters
+'''
+
+'''
+Starts program script
+'''
 
 print('Program started')
 sim.simxFinish(-1)  # just in case, close all opened connections
@@ -121,31 +210,13 @@ if clientID != -1:
     raw_range_data, raw_angle_data = readSensorData(clientID, laser_range_data, laser_angle_data)
     laser_data = np.array([raw_angle_data, raw_range_data]).T
 
-    # Fazendo leitura do laser
-    # Leitura do sensor para range e ângulo
-    # --> Remover as linhas de baixo pois se repetem
-    #raw_range_data, raw_angle_data = readSensorData(clientID, laser_range_data, laser_angle_data)
-    #laser_data = np.array([raw_angle_data, raw_range_data]).T
-
-    # print('laser infos')
-    # print("laser data: ", laser_data)
-    # print("laser angle: ", raw_angle_data)
-
     #print('INFORMAÇÕES DO LASER')
     print(laser_data)
-    draw_laser_data(laser_data)
+    #draw_laser_data(laser_data)
     #print('QUANTIDADE DE LEITURAS: ', len(laser_data))
 
-    returnCode, pos = sim.simxGetObjectPosition(clientID, robotHandle, -1, sim.simx_opmode_oneshot_wait)
-    print('Pos: ', pos)
-    #print('PosX: ', pos[0])
-    #print('PosY: ', pos[1])
-    #print('PosZ: ', pos[2])
-
-    #decompondo a posicao do robo
-    PosX = pos[0]
-    PosY = pos[1]
-    PosZ = pos[2]
+    #returnCode, pos = sim.simxGetObjectPosition(clientID, robotHandle, -1, sim.simx_opmode_oneshot_wait)
+    #print('Posição do Robô: ', pos)
 
     # Dados do Pioneer
     L = 0.381  # Metros
@@ -163,114 +234,108 @@ if clientID != -1:
         dt = now - lastTime
         #sim.simxAddStatusbarMessage(clientID, str(i) + ' - DT: ' + str(dt), sim.simx_opmode_oneshot_wait)
 
-
         '''
-        INÍCIO DO BLOCO DE MAPEAMENTO
+        Sart reading laser
         '''
-        # Para cada feixe de laser
-        # INVERSE SENSOR MODEL
-        RANGE_MAX = 5
-        RANGE_LIMIT = 0.3
-        PRIORI = 0.5
+        raw_range_data, raw_angle_data = readSensorData(clientID, laser_range_data, laser_angle_data)
+        laser_data = np.array([raw_angle_data, raw_range_data]).T
 
-        if raw_angle_data[i] < RANGE_MAX * RANGE_LIMIT:
-            taxaOC = 0.9
-        else:
-            taxaOC = 0.48
+        returnCode, pos = sim.simxGetObjectPosition(clientID, robotHandle, -1, sim.simx_opmode_oneshot_wait)
+        posX, posY, posZ = pos
+        print('Pos', pos)
 
-        largGrid, altGrid = 500
-        res = 0.02
-        x = PosX
-        y = PosY
-        xGrid = (x / res) + (largGrid / 2)
-        yGrid = (y / res) + (altGrid / 2)
-        largura = xGrid
+        #Converts robot position from environment to grid
+        posXGrid = int((posX / RES) + (LARGGRID / 2))
+        posYGrid = int(ALTGRID - ((posY / RES) + (ALTGRID / 2)))
+        print("Posição X e Y na Grid: ", posXGrid, posYGrid)
 
-        ########################################
-        # Inseridos por mim
         returnCode, th = sim.simxGetObjectOrientation(clientID, robotHandle, -1, sim.simx_opmode_oneshot_wait)
-        tx, ty, theta = th
-        ########################################
-
-        # Calcular a posição xL, yL de onde o laser bateu
-        xL = math.cos(raw_angle_data[i] + theta) * raw_angle_data[i] + PosX
-        yL = math.sin(raw_angle_data[i] + theta) * raw_angle_data[i] + PosY
-        #posX e posY são as coordenadas do robô na GRID
-
-        #Conversão das posições xL e yL
-
-        xLGrid = int((xL / res) + (largGrid / 2))
-        yLGrid = int(altGrid - ((yL / res) + (altGrid / 2)))
-
-        if xLGrid < 0:
-            xLGrid = 0
-        elif xLGrid >= largGrid:
-            xlwt = largGrid-1
-
-        # Calcular todos as células de acordo com o algoritmo de Bresenham
-        line_bresenham = np.zeros((rows, cols), dtype=np.uint8)
-        xi = posXgrid
-        yi = posYgrid
-        xoi = xLGrid
-        yoi = yLGrid
-        point1 = (yi, xi)
-        point2 =
+        ty, tz, theta = th
 
         '''
-        INÍCIO DO BLOCO DE NAVEGAÇÃO
+        Ends reading laser
         '''
 
-        #############
-        #############
-        #############
-        ## PAROU AQUI
-        #############
-        #############
-        #############
+        '''
+        Starts mapping
+        '''
+        for i in range(len(raw_range_data)):
+            if raw_range_data[i] < RANGE_MAX * RANGE_LIMIT:
+                taxaOC = 0.9
+            else:
+                taxaOC = 0.48
 
+            # get the position of where the laser hit
+            xL = math.cos(raw_angle_data[i] + theta) * raw_range_data[i] + posX
+            yL = math.sin(raw_angle_data[i] + theta) * raw_range_data[i] + posY
+            # posX e posY são as coordenadas do robô no ambiente
 
-        rows, cols = (map_size / cell_size).astype(int)
+            #Conversão das posições xL e yL
+            xLGrid = int((xL / RES) + (LARGGRID / 2))
+            yLGrid = int(ALTGRID - ((yL / RES) + (ALTGRID / 2)))
 
+            if xLGrid < 0:
+                xLGrid = 0
+            elif xLGrid >= LARGGRID:
+                xLGrid = LARGGRID-1
 
-        m = np.random.uniform(low=0.0, high=1.0, size=(rows, cols))
-        #rows, cols = 500
+            if yLGrid < 0:
+                yLGrid = 0
+            elif yLGrid >= ALTGRID:
+                yLGrid = ALTGRID-1
 
-        line_bresenham = np.zeros((rows, cols), dtype=np.uint8)
-        rr, cc = line(yi, xi, yoi, xoi)  # r0, c0, r1, c1
-        line_bresenham[rr, cc] = 1
+            # Calcular todos as células de acordo com o algoritmo de Bresenham
+            line_bresenham = np.zeros((rows, cols), dtype=np.uint8)
+            xi = posXGrid
+            yi = posYGrid
+            xoi = xLGrid
+            yoi = yLGrid
+            point1 = (yi, xi)
+            point2 = (yoi, xoi)
+            cells = get_line(point1, point2)
 
-        # ATUALIZAR A GRID
-        # Para cada célula da matriz por onde o feixe passa
-        # Atualizar a GRID
-        # P(MxLyL)
-        PMxLyL = 1 - pow((1 + (taxaOC / (1 - taxaOC)) * ((1 - PRIORI) / PRIORI) * (m[xL,yL] / ((1 - m[xL,yL])), -1)))
-        # Atualizar xL, yL de acordo com o algoritmo de Bresenham
+            for j in range(len(cells)):
+                linha, coluna = cells[j]
+                linha = int(linha)
+                coluna = int(coluna)
 
-        # MAPEAMENTO - FIM
+                if linha < 0:
+                    linha = 0
+                elif linha >= LARGGRID:
+                    linha = LARGGRID-1
 
-        # Velocidade básica (linear, angular)
+                if coluna < 0:
+                    coluna = 0
+                elif coluna >= ALTGRID:
+                    coluna = ALTGRID-1
+
+                m[linha, coluna] = 1 - pow(1 + (taxaOC/(1 - taxaOC)) * ((1 - PRIORI)/PRIORI) * (m[linha, coluna]/(1 - m[linha, coluna] + 0.00001)), -1) + 0.00001
+
+                if taxaOC > 0.5:
+                    taxaOC = 0.48
+                else:
+                    taxaOC = 0.95
+
+        '''
+        Ends mapping
+        '''
         v = 0
         w = np.deg2rad(0)
-
-        front = in (len(laser_data) / 2)
-        rightSide = int(len(laser_data) * 1 / 4)
-        leftSide = int(len(laser_data) * 3 / 4)
-
         '''
-        TESTAR ESSE BLOCO PARA ENCURTAR CÓDIGO ABAIXO
-        if ((laser_data[front, 1] < 1) or (laser_data[leftSide, 1] < 1)):
-              v = 0.05
-              w = np.deg2rad(-20)
+        Starts Navegation
         '''
+        frente = int(len(laser_data) / 2)
+        lado_direito = int(len(laser_data) * 1 / 4)
+        lado_esquerdo = int(len(laser_data) * 3 / 4)
 
         if laser_data[frente, 1] < 1:
-            v = 0.1
+            v = 0.05
             w = np.deg2rad(-30)
         elif laser_data[lado_direito, 1] < 1:
-            v = 0.1
+            v = 0.05
             w = np.deg2rad(30)
         elif laser_data[lado_esquerdo, 1] < 1:
-            v = 0.1
+            v = 0.05
             w = np.deg2rad(-30)
         else:
             v = 0.5
@@ -292,15 +357,25 @@ if clientID != -1:
         i = i + 1
         lastTime = now
 
+        '''
+        Ends Navegation
+        '''
+
     # Parando o robô
-    sim.simxSetJointTargetVelocity(clientID, r_wheel, 0, sim.simx_opmode_oneshot_wait)
-    sim.simxSetJointTargetVelocity(clientID, l_wheel, 0, sim.simx_opmode_oneshot_wait)
+    #sim.simxSetJointTargetVelocity(clientID, r_wheel, 0, sim.simx_opmode_oneshot_wait)
+    #sim.simxSetJointTargetVelocity(clientID, l_wheel, 0, sim.simx_opmode_oneshot_wait)
 
     # Parando a simulação
     sim.simxStopSimulation(clientID, sim.simx_opmode_blocking)
 
     # Now close the connection to CoppeliaSim:
     sim.simxFinish(clientID)
+
+    '''
+    Bloco para plotagem do mapa
+    '''
+    plt.imshow(m, cmap='Greys', origin='upper', extent=(0, cols, rows, 0))
+    plt.show()
 
 else:
     print('Failed connecting to remote API server')
