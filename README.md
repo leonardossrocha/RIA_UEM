@@ -23,6 +23,10 @@ matplotlib<br>
 time<br>
 math<br>
 
+### Exemplo
+
+![alt text](https://github.com/leonardossrocha/RIA_UEM/blob/master/examples/model1.png?raw=true)
+
 ### Cena para CoppeliaSim
 
 A cena criada para utilização no **simulador CoppeliaSim** está disponível com o nome:
